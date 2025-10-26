@@ -32,7 +32,7 @@ export const APP_CONFIG = {
 
 // API 配置
 export const API_CONFIG = {
-  BASE_URL: getRequiredEnv('VITE_API_BASE_URL', 'API 基础地址', 'http://api.localhost'),
+  BASE_URL: getRequiredEnv('VITE_API_BASE_URL', 'API 基础地址', 'https://poper-ops-interview-04.herokuapp.com'),
   TIMEOUT: parseInt(getRequiredEnv('VITE_API_TIMEOUT', 'API 超时时间', '10000')),
   VERSION: getRequiredEnv('VITE_API_VERSION', 'API 版本', 'v1'),
   ENDPOINTS: {
