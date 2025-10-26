@@ -235,6 +235,39 @@ const loadStudents = async () => {
 
 // 添加学生
 const addStudent = async () => {
+  // 前端参数校验
+  if (!studentForm.username || studentForm.username.trim() === '') {
+    ElMessage.error('请输入用户名')
+    return
+  }
+  
+  if (!studentForm.name || studentForm.name.trim() === '') {
+    ElMessage.error('请输入姓名')
+    return
+  }
+  
+  if (!studentForm.email || studentForm.email.trim() === '') {
+    ElMessage.error('请输入邮箱')
+    return
+  }
+  
+  // 邮箱格式校验
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(studentForm.email)) {
+    ElMessage.error('请输入正确的邮箱格式')
+    return
+  }
+  
+  if (!studentForm.password || studentForm.password.trim() === '') {
+    ElMessage.error('请输入密码')
+    return
+  }
+  
+  if (studentForm.password.length < 6) {
+    ElMessage.error('密码长度不能少于6位')
+    return
+  }
+  
   try {
     adding.value = true
     const response = await createStudent(studentForm)
@@ -330,6 +363,35 @@ const handleEditStudent = (student) => {
 
 // 更新学生
 const updateStudent = async () => {
+  // 前端参数校验
+  if (!editStudentForm.username || editStudentForm.username.trim() === '') {
+    ElMessage.error('请输入用户名')
+    return
+  }
+  
+  if (!editStudentForm.name || editStudentForm.name.trim() === '') {
+    ElMessage.error('请输入姓名')
+    return
+  }
+  
+  if (!editStudentForm.email || editStudentForm.email.trim() === '') {
+    ElMessage.error('请输入邮箱')
+    return
+  }
+  
+  // 邮箱格式校验
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(editStudentForm.email)) {
+    ElMessage.error('请输入正确的邮箱格式')
+    return
+  }
+  
+  // 如果输入了密码，校验密码长度
+  if (editStudentForm.password && editStudentForm.password.trim() !== '' && editStudentForm.password.length < 6) {
+    ElMessage.error('密码长度不能少于6位')
+    return
+  }
+  
   try {
     updating.value = true
     
@@ -341,7 +403,7 @@ const updateStudent = async () => {
     }
     
     // 如果密码不为空，则更新密码
-    if (editStudentForm.password) {
+    if (editStudentForm.password && editStudentForm.password.trim() !== '') {
       updateData.password = editStudentForm.password
     }
     
