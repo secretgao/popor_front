@@ -32,13 +32,6 @@
         </el-table-column>
         <el-table-column prop="teacher_name" label="授课教师" min-width="120" />
         <el-table-column prop="created_at" label="选课时间" width="180" />
-        <el-table-column label="状态" width="100">
-          <template #default="{ row }">
-            <el-tag :type="getStatusType(row.status)">
-              {{ getStatusText(row.status) }}
-            </el-tag>
-          </template>
-        </el-table-column>
       </el-table>
 
       <!-- 分页 -->
@@ -114,23 +107,6 @@ const handleCurrentChange = (val) => {
   loadCourses()
 }
 
-// 获取状态类型
-const getStatusType = (status) => {
-  switch (status) {
-    case 1: return 'success'
-    case 0: return 'warning'
-    default: return 'info'
-  }
-}
-
-// 获取状态文本
-const getStatusText = (status) => {
-  switch (status) {
-    case 1: return '已选课'
-    case 0: return '待确认'
-    default: return '未知'
-  }
-}
 
 onMounted(() => {
   loadCourses()
