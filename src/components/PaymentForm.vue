@@ -18,7 +18,7 @@
             controls-position="right"
             style="width: 200px"
           />
-          <span class="currency">THB</span>
+          <span class="currency">JPY</span>
         </el-form-item>
         
         <el-form-item label="描述" prop="description">
@@ -61,7 +61,7 @@
           <template #default>
             <p>公钥: {{ maskedPublicKey }}</p>
             <p>环境: 测试环境</p>
-            <p>支持货币: THB, USD, EUR</p>
+            <p>支持货币: JPY, USD, EUR</p>
           </template>
         </el-alert>
       </div>
@@ -125,7 +125,7 @@ const handlePayment = async () => {
     const paymentData = paymentService.createPaymentForm({
       amount: paymentForm.amount,
       description: paymentForm.description,
-      currency: 'THB'
+      currency: 'JPY'
     })
     
     console.log('支付数据:', paymentData)

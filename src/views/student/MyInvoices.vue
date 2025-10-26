@@ -355,12 +355,26 @@ const processPayment = async () => {
     }
     
     // 准备支付数据
+    const amount = parseFloat(paymentInvoice.value.amount);
+    
+    // 确保金额符合 Omise 最小要求（日元最小 100）
+    const minAmount = 100;
+    const finalAmount = amount < minAmount ? minAmount : amount;
+    
     const paymentData = {
-      amount: paymentInvoice.value.amount,
-      currency: 'THB',
+      amount: finalAmount,
+      currency: 'JPY',
       description: `课程费用 - ${paymentInvoice.value.course_name}`,
       invoice_id: paymentInvoice.value.id
     }
+    
+    console.log('💰 支付数据详情:', {
+      amount: paymentData.amount,
+      amountType: typeof paymentData.amount,
+      currency: paymentData.currency,
+      description: paymentData.description,
+      invoice_id: paymentData.invoice_id
+    })
     
     console.log('💳 开始 Omise 支付流程...')
     

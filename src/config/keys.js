@@ -53,14 +53,14 @@ export const BACKEND_CONFIG = {
 export const OMISE_CONFIG = {
   PUBLIC_KEY: 'pkey_test_65ggqd9jdlaax89pkex',
   ENVIRONMENT: 'test',
-  DEFAULT_CURRENCY: 'THB',
+  DEFAULT_CURRENCY: 'JPY',
 }
 
 // 支付相关配置
 export const PAYMENT_CONFIG = {
   ENABLED: getRequiredEnv('VITE_PAYMENT_ENABLED', '支付功能开关', 'true') === 'true',
   METHODS: getRequiredEnv('VITE_PAYMENT_METHODS', '支付方式', 'credit_card,bank_transfer').split(','),
-  CURRENCIES: getRequiredEnv('VITE_PAYMENT_CURRENCIES', '支持货币', 'THB,USD,EUR,JPY,SGD').split(','),
+  CURRENCIES: getRequiredEnv('VITE_PAYMENT_CURRENCIES', '支持货币', 'JPY,USD,EUR,THB,SGD').split(','),
 }
 
 // 认证配置

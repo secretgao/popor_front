@@ -23,7 +23,7 @@
             style="width: 200px"
           />
           <el-select v-model="paymentForm.currency" style="width: 100px; margin-left: 10px">
-            <el-option label="THB" value="THB" />
+            <el-option label="JPY" value="JPY" />
             <el-option label="USD" value="USD" />
             <el-option label="EUR" value="EUR" />
           </el-select>
@@ -110,7 +110,7 @@
           <template #default>
             <p><strong>公钥:</strong> {{ maskedPublicKey }}</p>
             <p><strong>环境:</strong> 测试环境</p>
-            <p><strong>支持货币:</strong> THB, USD, EUR</p>
+            <p><strong>支持货币:</strong> JPY, USD, EUR</p>
             <p><strong>测试卡片:</strong> 4242 4242 4242 4242</p>
           </template>
         </el-alert>
@@ -138,7 +138,7 @@ const loading = ref(false)
 // 支付表单数据
 const paymentForm = reactive({
   amount: 100,
-  currency: 'THB',
+  currency: 'JPY',
   description: '教育费用',
   cardNumber: '',
   expiry: '',
@@ -261,7 +261,7 @@ const handleOmisePayment = async () => {
 const resetForm = () => {
   paymentFormRef.value?.resetFields()
   paymentForm.amount = 100
-  paymentForm.currency = 'THB'
+  paymentForm.currency = 'JPY'
   paymentForm.description = '教育费用'
   paymentForm.cardNumber = ''
   paymentForm.expiry = ''

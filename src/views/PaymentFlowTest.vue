@@ -31,7 +31,7 @@
                 style="width: 200px"
               />
               <el-select v-model="testForm.currency" style="width: 100px; margin-left: 10px">
-                <el-option label="THB" value="THB" />
+                <el-option label="JPY" value="JPY" />
                 <el-option label="USD" value="USD" />
                 <el-option label="EUR" value="EUR" />
               </el-select>
@@ -195,7 +195,7 @@ const currentStep = ref(0)
 // 测试表单数据
 const testForm = reactive({
   amount: 100,
-  currency: 'THB',
+  currency: 'JPY',
   description: '教育费用测试',
   invoiceId: 'INV-' + Date.now(),
   cardNumber: '4242 4242 4242 4242',
@@ -345,7 +345,7 @@ const startPaymentTest = async () => {
 const resetTest = () => {
   testFormRef.value?.resetFields()
   testForm.amount = 100
-  testForm.currency = 'THB'
+  testForm.currency = 'JPY'
   testForm.description = '教育费用测试'
   testForm.invoiceId = 'INV-' + Date.now()
   testForm.cardNumber = '4242 4242 4242 4242'

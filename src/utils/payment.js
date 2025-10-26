@@ -53,13 +53,13 @@ export class PaymentService {
     return {
       publicKey: this.publicKey,
       amount: options.amount || 0,
-      currency: options.currency || 'THB',
+      currency: options.currency || 'JPY',
       description: options.description || '教育费用',
       // Omise 特定参数
       omise: {
         publicKey: this.publicKey,
         amount: options.amount * 100, // Omise 使用分为单位
-        currency: options.currency || 'THB',
+        currency: options.currency || 'JPY',
         description: options.description,
         returnUri: options.returnUri || window.location.origin + '/payment/success',
         cancelUri: options.cancelUri || window.location.origin + '/payment/cancel'
@@ -173,19 +173,24 @@ export class PaymentService {
       
       // 步骤3: 处理支付
       console.log('💳 步骤3: 处理支付')
+      
+      const requestData = {
+        token: tokenResult.token_id,
+        amount: paymentData.amount,
+        currency: paymentData.currency,
+        description: paymentData.description,
+        invoice_id: paymentData.invoice_id
+      }
+      
+      console.log('📤 发送给后端的支付数据:', requestData)
+      
       const response = await fetch(`${API_CONFIG.BASE_URL}/api/payment/process`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({
-          token: tokenResult.token_id,
-          amount: paymentData.amount,
-          currency: paymentData.currency,
-          description: paymentData.description,
-          invoice_id: paymentData.invoice_id // 添加发票ID支持
-        })
+        body: JSON.stringify(requestData)
       })
 
       const result = await response.json()
@@ -211,7 +216,7 @@ export class PaymentService {
     return {
       publicKey: this.publicKey,
       amount: options.amount || 0,
-      currency: options.currency || 'THB',
+      currency: options.currency || 'JPY',
       description: options.description || '教育费用',
       // 其他支付参数...
     }
