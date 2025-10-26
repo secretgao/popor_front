@@ -82,7 +82,7 @@
     </el-dialog>
 
     <!-- 支付对话框 -->
-    <el-dialog v-model="showPaymentDialog" title="支付账单" width="500px">
+    <el-dialog v-model="showPaymentDialog" title="支付账单" width="600px">
       <div v-if="paymentInvoice" class="payment-detail">
         <el-alert
           title="支付信息"
@@ -98,27 +98,56 @@
           </template>
         </el-alert>
 
-        <el-form :model="paymentForm" label-width="100px">
-          <el-form-item label="支付方式">
-            <el-radio-group v-model="paymentForm.payment_method">
-              <el-radio label="credit_card">信用卡</el-radio>
-              <el-radio label="debit_card">借记卡</el-radio>
-              <el-radio label="bank_transfer">银行转账</el-radio>
-            </el-radio-group>
+        <!-- 支付表单 -->
+        <el-form :model="paymentForm" :rules="paymentRules" ref="paymentFormRef" label-width="120px">
+          <!-- 卡片信息 -->
+          <el-divider content-position="left">信用卡信息</el-divider>
+          
+          <el-form-item label="卡片号码" prop="cardNumber">
+            <el-input
+              v-model="paymentForm.cardNumber"
+              placeholder="1234 5678 9012 3456"
+              maxlength="19"
+              @input="formatCardNumber"
+            />
           </el-form-item>
-          <el-form-item label="备注">
-            <el-input 
-              v-model="paymentForm.notes" 
-              type="textarea" 
-              :rows="3"
-              placeholder="支付备注（可选）"
+          
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="有效期" prop="expiry">
+                <el-input
+                  v-model="paymentForm.expiry"
+                  placeholder="MM/YY"
+                  maxlength="5"
+                  @input="formatExpiry"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="CVV" prop="cvv">
+                <el-input
+                  v-model="paymentForm.cvv"
+                  placeholder="123"
+                  maxlength="4"
+                  type="password"
+                  show-password
+                />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          
+          <el-form-item label="持卡人姓名" prop="cardName">
+            <el-input
+              v-model="paymentForm.cardName"
+              placeholder="请输入持卡人姓名"
+              maxlength="50"
             />
           </el-form-item>
         </el-form>
       </div>
       <template #footer>
         <el-button @click="showPaymentDialog = false">取消</el-button>
-        <el-button type="primary" @click="processPayment" :loading="processing">
+        <el-button type="primary" @click="processPayment" :loading="processing" :disabled="!isFormValid">
           确认支付
         </el-button>
       </template>
@@ -127,11 +156,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
 import { getInvoices, getCourses } from '@/utils/api'
 import { showApiError } from '@/utils/errorHandler'
+import { paymentService } from '@/utils/payment'
 
 const authStore = useAuthStore()
 
@@ -153,10 +183,43 @@ const pagination = reactive({
   total: 0
 })
 
+// 表单引用
+const paymentFormRef = ref()
+
 // 支付表单
 const paymentForm = reactive({
-  payment_method: 'credit_card',
-  notes: ''
+  cardNumber: '',
+  expiry: '',
+  cvv: '',
+  cardName: ''
+})
+
+// 表单验证规则
+const paymentRules = {
+  cardNumber: [
+    { required: true, message: '请输入卡片号码', trigger: 'blur' },
+    { min: 13, max: 19, message: '卡片号码长度不正确', trigger: 'blur' }
+  ],
+  expiry: [
+    { required: true, message: '请输入有效期', trigger: 'blur' },
+    { pattern: /^(0[1-9]|1[0-2])\/\d{2}$/, message: '格式应为 MM/YY', trigger: 'blur' }
+  ],
+  cvv: [
+    { required: true, message: '请输入CVV', trigger: 'blur' },
+    { min: 3, max: 4, message: 'CVV长度应为3-4位', trigger: 'blur' }
+  ],
+  cardName: [
+    { required: true, message: '请输入持卡人姓名', trigger: 'blur' },
+    { min: 2, max: 50, message: '姓名长度在2到50个字符', trigger: 'blur' }
+  ]
+}
+
+// 表单是否有效
+const isFormValid = computed(() => {
+  return paymentForm.cardNumber.length >= 13 &&
+         paymentForm.expiry.length === 5 &&
+         paymentForm.cvv.length >= 3 &&
+         paymentForm.cardName.length >= 2
 })
 
 // 加载账单列表
@@ -234,31 +297,75 @@ const viewInvoice = (invoice) => {
 const payInvoice = (invoice) => {
   paymentInvoice.value = invoice
   showPaymentDialog.value = true
+  // 重置表单
   Object.assign(paymentForm, {
-    payment_method: 'credit_card',
-    notes: ''
+    cardNumber: '',
+    expiry: '',
+    cvv: '',
+    cardName: ''
   })
+}
+
+// 格式化卡片号码
+const formatCardNumber = (value) => {
+  const numbers = value.replace(/\D/g, '')
+  paymentForm.cardNumber = numbers.replace(/(\d{4})(?=\d)/g, '$1 ')
+}
+
+// 格式化有效期
+const formatExpiry = (value) => {
+  const numbers = value.replace(/\D/g, '')
+  if (numbers.length >= 2) {
+    paymentForm.expiry = numbers.substring(0, 2) + '/' + numbers.substring(2, 4)
+  } else {
+    paymentForm.expiry = numbers
+  }
 }
 
 // 处理支付
 const processPayment = async () => {
+  if (!paymentFormRef.value) return
+  
   try {
+    // 验证表单
+    await paymentFormRef.value.validate()
+    
     processing.value = true
     
-    console.log('🔍 开始处理支付:', paymentInvoice.value)
-    console.log('📤 支付表单数据:', paymentForm)
+    console.log('🚀 开始完整支付流程...')
+    console.log('📋 账单信息:', paymentInvoice.value)
+    console.log('💳 卡片信息:', paymentForm)
     
-    // 这里应该调用 API 处理支付
-    // 暂时模拟支付成功
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    // 准备卡片数据
+    const cardData = {
+      number: paymentForm.cardNumber.replace(/\s/g, ''),
+      expiration_month: paymentForm.expiry.split('/')[0],
+      expiration_year: '20' + paymentForm.expiry.split('/')[1],
+      security_code: paymentForm.cvv,
+      name: paymentForm.cardName
+    }
     
-    console.log('✅ 支付处理成功')
+    // 准备支付数据
+    const paymentData = {
+      amount: paymentInvoice.value.amount,
+      currency: 'THB',
+      description: `课程费用 - ${paymentInvoice.value.course_name}`,
+      invoice_id: paymentInvoice.value.id
+    }
+    
+    console.log('💳 开始 Omise 支付流程...')
+    
+    // 使用完整的支付流程
+    const result = await paymentService.processOmisePayment(cardData, paymentData)
+    
+    console.log('✅ 支付处理成功:', result)
     ElMessage.success('支付成功！')
     showPaymentDialog.value = false
     loadInvoices() // 重新加载账单列表
+    
   } catch (error) {
-    console.error('💥 支付处理异常:', error)
-    showApiError(error, '支付失败，请重试')
+    console.error('❌ 支付处理失败:', error)
+    ElMessage.error('支付失败: ' + error.message)
   } finally {
     processing.value = false
   }
