@@ -49,20 +49,78 @@ export class PaymentService {
   }
 
   /**
+   * 获取支付配置
+   */
+  async getPaymentConfig() {
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/api/payment/config`)
+      const result = await response.json()
+      
+      if (result.success) {
+        console.log('✅ 支付配置获取成功:', result.data)
+        return result.data
+      } else {
+        throw new Error(result.message || '获取支付配置失败')
+      }
+    } catch (error) {
+      console.error('❌ 获取支付配置失败:', error)
+      throw error
+    }
+  }
+
+  /**
+   * 创建支付令牌（通过后端代理）
+   * @param {Object} cardData 卡片数据
+   */
+  async createPaymentToken(cardData) {
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/api/payment/create-token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: cardData.name,
+          number: cardData.number,
+          expiration_month: cardData.expiration_month,
+          expiration_year: cardData.expiration_year,
+          security_code: cardData.security_code
+        })
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        console.log('✅ 支付令牌创建成功:', result.data.token_id)
+        return result.data
+      } else {
+        throw new Error(result.message || '创建支付令牌失败')
+      }
+    } catch (error) {
+      console.error('❌ 创建支付令牌失败:', error)
+      throw error
+    }
+  }
+
+  /**
    * 处理 Omise 支付
    * @param {Object} cardData 卡片数据
    * @param {Object} paymentData 支付数据
    */
   async processOmisePayment(cardData, paymentData) {
     try {
-      if (!window.Omise) {
-        throw new Error('Omise SDK 未加载')
-      }
-
-      // 创建 Omise 令牌
-      const token = await this.createOmiseToken(cardData)
+      console.log('🚀 开始支付流程...')
       
-      // 发送到后端处理支付
+      // 步骤1: 获取支付配置
+      console.log('📋 步骤1: 获取支付配置')
+      const config = await this.getPaymentConfig()
+      
+      // 步骤2: 创建支付令牌
+      console.log('🔑 步骤2: 创建支付令牌')
+      const tokenResult = await this.createPaymentToken(cardData)
+      
+      // 步骤3: 处理支付
+      console.log('💳 步骤3: 处理支付')
       const response = await fetch(`${API_CONFIG.BASE_URL}/api/payment/process`, {
         method: 'POST',
         headers: {
@@ -70,16 +128,24 @@ export class PaymentService {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({
-          token: token.id,
+          token: tokenResult.token_id,
           amount: paymentData.amount,
           currency: paymentData.currency,
-          description: paymentData.description
+          description: paymentData.description,
+          invoice_id: paymentData.invoice_id // 添加发票ID支持
         })
       })
 
-      return await response.json()
+      const result = await response.json()
+      
+      if (result.success) {
+        console.log('✅ 支付处理成功:', result.data)
+        return result.data
+      } else {
+        throw new Error(result.message || '支付处理失败')
+      }
     } catch (error) {
-      console.error('Omise 支付处理失败:', error)
+      console.error('❌ Omise 支付处理失败:', error)
       throw error
     }
   }

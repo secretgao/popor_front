@@ -126,6 +126,9 @@ import { CreditCard } from '@element-plus/icons-vue'
 import { paymentService } from '@/utils/payment'
 import { API_KEYS } from '@/config/keys'
 
+// 定义事件
+const emit = defineEmits(['payment-success', 'payment-error'])
+
 // 表单引用
 const paymentFormRef = ref()
 
@@ -216,9 +219,6 @@ const handleOmisePayment = async () => {
     
     loading.value = true
     
-    // 初始化 Omise
-    paymentService.initPayment()
-    
     // 准备卡片数据
     const cardData = {
       number: paymentForm.cardNumber.replace(/\s/g, ''),
@@ -232,19 +232,26 @@ const handleOmisePayment = async () => {
     const paymentData = {
       amount: paymentForm.amount,
       currency: paymentForm.currency,
-      description: paymentForm.description
+      description: paymentForm.description,
+      invoice_id: 'INV-' + Date.now() // 示例发票ID
     }
     
-    console.log('处理 Omise 支付:', { cardData, paymentData })
+    console.log('🚀 开始支付流程:', { cardData, paymentData })
     
-    // 模拟支付处理
-    await new Promise(resolve => setTimeout(resolve, 3000))
+    // 使用完整的支付流程
+    const result = await paymentService.processOmisePayment(cardData, paymentData)
     
-    ElMessage.success('Omise 支付处理成功！')
+    ElMessage.success('支付成功！' + JSON.stringify(result))
+    
+    // 触发支付成功事件
+    emit('payment-success', result)
     
   } catch (error) {
-    console.error('Omise 支付失败:', error)
+    console.error('❌ Omise 支付失败:', error)
     ElMessage.error('支付失败: ' + error.message)
+    
+    // 触发支付错误事件
+    emit('payment-error', error)
   } finally {
     loading.value = false
   }
