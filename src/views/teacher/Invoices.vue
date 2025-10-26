@@ -271,6 +271,27 @@ const createInvoiceHandler = async () => {
     return
   }
   
+  // 前端表单验证
+  if (!invoiceForm.student_id) {
+    ElMessage.error('请选择学生')
+    return
+  }
+  
+  if (!invoiceForm.course_id) {
+    ElMessage.error('请选择课程')
+    return
+  }
+  
+  if (!invoiceForm.amount || invoiceForm.amount <= 0) {
+    ElMessage.error('账单金额必须大于0')
+    return
+  }
+  
+  if (!invoiceForm.year_month) {
+    ElMessage.error('请选择年月')
+    return
+  }
+  
   try {
     creating.value = true
     const response = await createInvoice(invoiceForm)
