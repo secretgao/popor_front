@@ -40,7 +40,7 @@ export default defineConfig(({ command, mode }) => {
       outDir: env.VITE_BUILD_OUT_DIR,
       assetsDir: env.VITE_BUILD_ASSETS_DIR,
       sourcemap: env.VITE_BUILD_SOURCE_MAP === 'true',
-      minify: env.VITE_BUILD_MINIFY === 'true' ? 'terser' : false,
+      minify: env.VITE_BUILD_MINIFY === 'true' ? 'esbuild' : false,
       rollupOptions: {
         output: {
           manualChunks: {
