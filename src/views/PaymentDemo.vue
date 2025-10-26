@@ -15,6 +15,7 @@
       
       <el-divider />
       
+      
       <!-- 支付表单 -->
       <OmisePaymentForm 
         v-if="currentStep < 3"
@@ -103,6 +104,7 @@ const paymentResult = reactive({
   data: null
 })
 
+
 // 初始化
 onMounted(() => {
   initializePayment()
@@ -162,6 +164,7 @@ const viewDetails = () => {
     ElMessage.info('支付详情: ' + JSON.stringify(paymentResult.data, null, 2))
   }
 }
+
 </script>
 
 <style scoped>

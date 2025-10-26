@@ -106,10 +106,11 @@
           <el-form-item label="卡片号码" prop="cardNumber">
             <el-input
               v-model="paymentForm.cardNumber"
-              placeholder="1234 5678 9012 3456"
+              placeholder="4242424242424242 (测试卡号)"
               maxlength="19"
               @input="formatCardNumber"
             />
+            <div class="form-tip">💡 测试卡号：4242424242424242</div>
           </el-form-item>
           
           <el-row :gutter="20">
@@ -117,21 +118,23 @@
               <el-form-item label="有效期" prop="expiry">
                 <el-input
                   v-model="paymentForm.expiry"
-                  placeholder="MM/YY"
+                  placeholder="12/25 (测试)"
                   maxlength="5"
                   @input="formatExpiry"
                 />
+                <div class="form-tip">💡 测试：12/25</div>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="CVV" prop="cvv">
                 <el-input
                   v-model="paymentForm.cvv"
-                  placeholder="123"
+                  placeholder="123 (测试)"
                   maxlength="4"
                   type="password"
                   show-password
                 />
+                <div class="form-tip">💡 测试：123</div>
               </el-form-item>
             </el-col>
           </el-row>
@@ -139,9 +142,10 @@
           <el-form-item label="持卡人姓名" prop="cardName">
             <el-input
               v-model="paymentForm.cardName"
-              placeholder="请输入持卡人姓名"
+              placeholder="John Doe (测试)"
               maxlength="50"
             />
+            <div class="form-tip">💡 测试：John Doe</div>
           </el-form-item>
         </el-form>
       </div>
@@ -210,7 +214,12 @@ const paymentRules = {
   ],
   cardName: [
     { required: true, message: '请输入持卡人姓名', trigger: 'blur' },
-    { min: 2, max: 50, message: '姓名长度在2到50个字符', trigger: 'blur' }
+    { min: 2, max: 50, message: '姓名长度在2到50个字符', trigger: 'blur' },
+    { 
+      pattern: /^[a-zA-Z\s\u4e00-\u9fa5]+$/, 
+      message: '姓名只能包含字母、空格和中文', 
+      trigger: 'blur' 
+    }
   ]
 }
 
@@ -340,7 +349,7 @@ const processPayment = async () => {
     const cardData = {
       number: paymentForm.cardNumber.replace(/\s/g, ''),
       expiration_month: paymentForm.expiry.split('/')[0],
-      expiration_year: '20' + paymentForm.expiry.split('/')[1],
+      expiration_year: '20' + paymentForm.expiry.split('/')[1], // 转换为4位年份
       security_code: paymentForm.cvv,
       name: paymentForm.cardName
     }
@@ -430,6 +439,16 @@ onMounted(() => {
   margin-top: 20px;
   display: flex;
   justify-content: center;
+}
+
+.form-tip {
+  font-size: 12px;
+  color: #67c23a;
+  margin-top: 4px;
+  background: #f0f9ff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border-left: 3px solid #67c23a;
 }
 
 .invoice-detail,

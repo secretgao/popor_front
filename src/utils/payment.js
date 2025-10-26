@@ -20,7 +20,7 @@ export class PaymentService {
     // 检查 Omise SDK 是否已加载
     if (typeof window !== 'undefined' && window.Omise) {
       window.Omise.setPublicKey(this.publicKey)
-      console.log('✅ Omise 初始化成功')
+      console.log('✅ Omise 初始化成功，公钥已设置')
       return true
     } else {
       console.error('❌ Omise SDK 未加载，请检查网络连接或刷新页面')
@@ -35,6 +35,8 @@ export class PaymentService {
     for (let i = 0; i < maxAttempts; i++) {
       if (typeof window !== 'undefined' && window.Omise) {
         console.log('✅ Omise SDK 已加载')
+        console.log('🔍 Omise SDK 版本:', window.Omise.version || '未知')
+        console.log('🔍 Omise SDK 方法:', Object.keys(window.Omise))
         return true
       }
       console.log(`⏳ 等待 Omise SDK 加载... (${i + 1}/${maxAttempts})`)
@@ -98,16 +100,47 @@ export class PaymentService {
       window.Omise.setPublicKey(this.publicKey)
 
       console.log('🔑 使用 Omise SDK 创建支付令牌...')
+      console.log('📋 卡片数据:', cardData)
+      console.log('🔑 当前公钥:', this.publicKey)
       
-      // 直接调用 Omise SDK 创建 token
-      const token = await window.Omise.createToken({
-        card: {
-          name: cardData.name,
+      // 验证卡片数据
+      if (!cardData.name || cardData.name.trim() === '') {
+        throw new Error('持卡人姓名不能为空')
+      }
+      if (!cardData.number || cardData.number.length < 13) {
+        throw new Error('卡片号码格式不正确')
+      }
+      if (!cardData.security_code || cardData.security_code.length < 3) {
+        throw new Error('CVV 格式不正确')
+      }
+      
+      // 使用 Promise 包装 Omise SDK 的回调函数
+      const token = await new Promise((resolve, reject) => {
+        const tokenData = {
+          name: cardData.name.trim(), // 去除首尾空格
           number: cardData.number,
-          expiration_month: cardData.expiration_month,
-          expiration_year: cardData.expiration_year,
+          expiration_month: parseInt(cardData.expiration_month),
+          expiration_year: parseInt(cardData.expiration_year),
           security_code: cardData.security_code
         }
+        
+        console.log('📤 发送给 Omise 的数据:', tokenData)
+        
+        window.Omise.createToken('card', tokenData, (statusCode, response) => {
+          console.log('🔍 Omise SDK 响应:', { statusCode, response })
+          if (statusCode === 200) {
+            console.log('✅ Omise SDK 响应成功:', response)
+            resolve(response)
+          } else {
+            console.error('❌ Omise SDK 响应失败:', response)
+            console.error('❌ 错误详情:', {
+              code: response.code,
+              message: response.message,
+              location: response.location
+            })
+            reject(new Error(response.message || '创建令牌失败'))
+          }
+        })
       })
 
       console.log('✅ 支付令牌创建成功:', token.id)
