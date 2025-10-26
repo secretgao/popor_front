@@ -296,14 +296,9 @@ const createInvoiceHandler = async () => {
       })
       loadInvoices()
     } else {
+      // 如果 success 为 false，直接显示接口返回的错误信息
       const errorMessage = response.data.message || '创建账单失败'
-      
-      // 检查是否是重复账单错误
-      if (errorMessage.includes('账单已存在') || errorMessage.includes('duplicate key') || errorMessage.includes('unique constraint')) {
-        ElMessage.warning('该学生在此课程和年月的账单已存在，请选择其他年月或检查现有账单')
-      } else {
-        ElMessage.error(errorMessage)
-      }
+      ElMessage.error(errorMessage)
       console.error('创建账单失败:', response.data)
     }
   } catch (error) {
@@ -311,13 +306,12 @@ const createInvoiceHandler = async () => {
     
     // 更详细的错误处理
     if (error.response) {
-      // 服务器响应了错误状态码
+      // 服务器响应了错误状态码，优先使用接口返回的错误信息
       const errorMessage = error.response.data?.message || error.response.statusText || '服务器错误'
-      const statusCode = error.response.status
       
-      // 检查是否是重复账单错误 (409 Conflict 或包含重复关键词)
-      if (statusCode === 409 || errorMessage.includes('duplicate key') || errorMessage.includes('unique constraint') || errorMessage.includes('uq_invoice_unique') || errorMessage.includes('账单已存在')) {
-        ElMessage.warning('该学生在此课程和年月的账单已存在，请选择其他年月或检查现有账单')
+      // 直接显示接口返回的错误信息，不重复处理
+      if (error.response.data?.message) {
+        ElMessage.error(errorMessage)
       } else {
         ElMessage.error(`创建账单失败: ${errorMessage}`)
       }
@@ -344,9 +338,10 @@ const viewInvoice = (invoice) => {
 // 获取状态类型
 const getStatusType = (status) => {
   switch (status) {
-    case 0: return 'warning'  // 待支付
-    case 1: return 'success'   // 已支付
-    case 2: return 'danger'    // 已过期
+    case 0: return 'warning'    // 待支付
+    case 1: return 'info'        // 支付中
+    case 2: return 'success'     // 支付成功
+    case 3: return 'danger'      // 支付失败
     default: return 'info'
   }
 }
