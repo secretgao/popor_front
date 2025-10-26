@@ -17,13 +17,30 @@ export class PaymentService {
   initPayment() {
     console.log('Omise 支付网关初始化，公钥:', this.publicKey)
     
-    // 初始化 Omise
+    // 检查 Omise SDK 是否已加载
     if (typeof window !== 'undefined' && window.Omise) {
       window.Omise.setPublicKey(this.publicKey)
-      console.log('Omise 初始化成功')
+      console.log('✅ Omise 初始化成功')
+      return true
     } else {
-      console.warn('Omise SDK 未加载，请确保已引入 Omise.js')
+      console.error('❌ Omise SDK 未加载，请检查网络连接或刷新页面')
+      return false
     }
+  }
+
+  /**
+   * 等待 Omise SDK 加载
+   */
+  async waitForOmiseSDK(maxAttempts = 10, delay = 500) {
+    for (let i = 0; i < maxAttempts; i++) {
+      if (typeof window !== 'undefined' && window.Omise) {
+        console.log('✅ Omise SDK 已加载')
+        return true
+      }
+      console.log(`⏳ 等待 Omise SDK 加载... (${i + 1}/${maxAttempts})`)
+      await new Promise(resolve => setTimeout(resolve, delay))
+    }
+    throw new Error('Omise SDK 加载超时，请检查网络连接')
   }
 
   /**
@@ -74,10 +91,11 @@ export class PaymentService {
    */
   async createPaymentToken(cardData) {
     try {
-      // 检查 Omise SDK 是否已加载
-      if (!window.Omise) {
-        throw new Error('Omise SDK 未加载，请检查网络连接')
-      }
+      // 等待 Omise SDK 加载
+      await this.waitForOmiseSDK()
+      
+      // 设置公钥
+      window.Omise.setPublicKey(this.publicKey)
 
       console.log('🔑 使用 Omise SDK 创建支付令牌...')
       

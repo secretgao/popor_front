@@ -51,9 +51,9 @@ export const BACKEND_CONFIG = {
 
 // Omise 支付配置
 export const OMISE_CONFIG = {
-  PUBLIC_KEY: getRequiredEnv('VITE_OMISE_PUBLIC_KEY', 'Omise 公钥', 'pkey_test_65ggqd9jdlaax89pkex'),
-  ENVIRONMENT: getRequiredEnv('VITE_OMISE_ENVIRONMENT', 'Omise 环境', 'test'),
-  DEFAULT_CURRENCY: getRequiredEnv('VITE_OMISE_DEFAULT_CURRENCY', 'Omise 默认货币', 'THB'),
+  PUBLIC_KEY: 'pkey_test_65ggqd9jdlaax89pkex',
+  ENVIRONMENT: 'test',
+  DEFAULT_CURRENCY: 'THB',
 }
 
 // 支付相关配置
