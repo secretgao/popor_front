@@ -37,9 +37,25 @@
           </template>
         </el-table-column>
         <el-table-column prop="created_at" label="创建时间" width="180" />
-        <el-table-column label="操作" width="100">
+        <el-table-column label="操作" width="200">
           <template #default="{ row }">
             <el-button size="small" @click="viewInvoice(row)">查看</el-button>
+            <el-button 
+              v-if="row.status === 0"
+              size="small" 
+              type="success" 
+              @click="sendToStudent(row)"
+            >
+              发送给学生
+            </el-button>
+            <el-button 
+              v-else
+              size="small" 
+              type="info" 
+              disabled
+            >
+              已发送给学生
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -154,7 +170,7 @@
 import { ref, reactive, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
-import { getInvoices, createInvoice, updateInvoice, getStudents, getCourses } from '@/utils/api'
+import { getInvoices, createInvoice, updateInvoice, updateInvoiceStatus, getStudents, getCourses } from '@/utils/api'
 
 // 数据
 const invoices = ref([])
@@ -354,15 +370,47 @@ const viewInvoice = (invoice) => {
   showDetailDialog.value = true
 }
 
+// 发送给学生
+const sendToStudent = async (invoice) => {
+  try {
+    await ElMessageBox.confirm(
+      `确定要将账单发送给学生 "${invoice.student_name}" 吗？`,
+      '确认发送',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    )
+
+    // 调用 API 更新状态
+    const response = await updateInvoiceStatus(invoice.id, 1)
+    
+    if (response.data.success) {
+      ElMessage.success('账单已发送给学生')
+      // 重新加载账单列表
+      await loadInvoices()
+    } else {
+      ElMessage.error(response.data.message || '发送失败')
+    }
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('发送账单失败:', error)
+      ElMessage.error('发送账单失败')
+    }
+  }
+}
+
 
 
 // 获取状态类型
 const getStatusType = (status) => {
   switch (status) {
-    case 0: return 'warning'    // 待支付
-    case 1: return 'info'        // 支付中
-    case 2: return 'success'     // 支付成功
-    case 3: return 'danger'      // 支付失败
+    case 0: return 'info'        // 待发送
+    case 1: return 'warning'     // 待支付
+    case 2: return 'info'        // 支付中
+    case 3: return 'success'     // 支付成功
+    case 4: return 'danger'      // 支付失败
     default: return 'info'
   }
 }

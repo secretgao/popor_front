@@ -190,6 +190,10 @@ export const deleteInvoice = (id) => {
   return api.delete(`/invoices/${id}`)
 }
 
+export const updateInvoiceStatus = (id, status) => {
+  return api.put(`/invoices/${id}/status`, { status })
+}
+
 // 仪表盘统计 API
 export const getDashboardStats = () => {
   return api.get('/dashboard/stats')
