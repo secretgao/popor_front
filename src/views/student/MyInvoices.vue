@@ -29,7 +29,7 @@
           <template #default="{ row }">
             <el-button size="small" @click="viewInvoice(row)">查看详情</el-button>
             <el-button 
-              v-if="row.status !== 2"
+              v-if="row.status !== 3"
               size="small" 
               type="primary" 
               @click="payInvoice(row)"
@@ -398,10 +398,11 @@ const processPayment = async () => {
 // 获取状态类型
 const getStatusType = (status) => {
   switch (status) {
-    case 0: return 'warning'  // 待支付
-    case 1: return 'info'     // 支付中
-    case 2: return 'success'  // 支付成功
-    case 3: return 'danger'   // 支付失败
+    case 0: return 'info'      // 待发送
+    case 1: return 'warning'   // 待支付
+    case 2: return 'info'      // 支付中
+    case 3: return 'success'   // 支付成功
+    case 4: return 'danger'    // 支付失败
     default: return 'info'
   }
 }
