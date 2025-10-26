@@ -29,12 +29,12 @@
           <template #default="{ row }">
             <el-button size="small" @click="viewInvoice(row)">查看详情</el-button>
             <el-button 
+              v-if="row.status !== 2"
               size="small" 
               type="primary" 
               @click="payInvoice(row)"
-              :disabled="row.status === 1"
             >
-              {{ row.status === 1 ? '已支付' : '立即支付' }}
+              立即支付
             </el-button>
           </template>
         </el-table-column>
@@ -399,8 +399,9 @@ const processPayment = async () => {
 const getStatusType = (status) => {
   switch (status) {
     case 0: return 'warning'  // 待支付
-    case 1: return 'success'   // 已支付
-    case 2: return 'danger'    // 已过期
+    case 1: return 'info'     // 支付中
+    case 2: return 'success'  // 支付成功
+    case 3: return 'danger'   // 支付失败
     default: return 'info'
   }
 }
