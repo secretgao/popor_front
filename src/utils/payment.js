@@ -69,32 +69,33 @@ export class PaymentService {
   }
 
   /**
-   * 创建支付令牌（通过后端代理）
+   * 创建支付令牌（前端直接调用 Omise SDK）
    * @param {Object} cardData 卡片数据
    */
   async createPaymentToken(cardData) {
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/api/payment/create-token`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+      // 检查 Omise SDK 是否已加载
+      if (!window.Omise) {
+        throw new Error('Omise SDK 未加载，请检查网络连接')
+      }
+
+      console.log('🔑 使用 Omise SDK 创建支付令牌...')
+      
+      // 直接调用 Omise SDK 创建 token
+      const token = await window.Omise.createToken({
+        card: {
           name: cardData.name,
           number: cardData.number,
           expiration_month: cardData.expiration_month,
           expiration_year: cardData.expiration_year,
           security_code: cardData.security_code
-        })
+        }
       })
 
-      const result = await response.json()
-      
-      if (result.success) {
-        console.log('✅ 支付令牌创建成功:', result.data.token_id)
-        return result.data
-      } else {
-        throw new Error(result.message || '创建支付令牌失败')
+      console.log('✅ 支付令牌创建成功:', token.id)
+      return {
+        token_id: token.id,
+        token: token
       }
     } catch (error) {
       console.error('❌ 创建支付令牌失败:', error)
@@ -150,27 +151,6 @@ export class PaymentService {
     }
   }
 
-  /**
-   * 创建 Omise 令牌
-   * @param {Object} cardData 卡片数据
-   */
-  async createOmiseToken(cardData) {
-    return new Promise((resolve, reject) => {
-      window.Omise.createToken('card', {
-        number: cardData.number,
-        expiration_month: cardData.expiration_month,
-        expiration_year: cardData.expiration_year,
-        security_code: cardData.security_code,
-        name: cardData.name
-      }, (statusCode, response) => {
-        if (statusCode === 200) {
-          resolve(response)
-        } else {
-          reject(new Error(response.message || '创建令牌失败'))
-        }
-      })
-    })
-  }
 
   /**
    * 创建支付表单

@@ -9,7 +9,7 @@
       <!-- 步骤指示器 -->
       <el-steps :active="currentStep" finish-status="success" align-center>
         <el-step title="获取配置" description="GET /api/payment/config"></el-step>
-        <el-step title="创建令牌" description="POST /api/payment/create-token"></el-step>
+        <el-step title="创建令牌" description="前端 Omise SDK 创建 token"></el-step>
         <el-step title="处理支付" description="POST /api/payment/process"></el-step>
         <el-step title="Webhook回调" description="POST /api/payment/webhook"></el-step>
         <el-step title="完成" description="支付成功"></el-step>
@@ -152,7 +152,7 @@
             </div>
             <div class="step">
               <h4>2. 前端创建支付令牌</h4>
-              <p>调用 <code>POST /api/payment/create-token</code> 传递卡片信息，获取 token_id</p>
+              <p>使用前端 Omise SDK 直接创建 token，无需调用后端接口</p>
               <el-tag type="warning">敏感信息仅用于生成令牌</el-tag>
             </div>
             <div class="step">
@@ -292,7 +292,7 @@ const startPaymentTest = async () => {
     
     // 步骤2: 创建支付令牌
     currentStep.value = 2
-    addTestResult('步骤2: 创建支付令牌', '调用 POST /api/payment/create-token', true)
+    addTestResult('步骤2: 创建支付令牌', '使用前端 Omise SDK 创建 token', true)
     
     const cardData = {
       number: testForm.cardNumber.replace(/\s/g, ''),

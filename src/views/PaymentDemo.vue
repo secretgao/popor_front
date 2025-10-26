@@ -70,7 +70,7 @@
 paymentService.initPayment()
 
 // 2. 创建令牌
-const token = await paymentService.createOmiseToken(cardData)
+const token = await paymentService.createPaymentToken(cardData)
 
 // 3. 处理支付
 const result = await paymentService.processOmisePayment(cardData, paymentData)</code></pre>
