@@ -2,7 +2,8 @@
   <div class="test-api-page">
     <h2>API测试页面</h2>
     
-    <el-card class="test-card">
+    <!-- 学生API测试已注释 -->
+    <!-- <el-card class="test-card">
       <template #header>
         <span>学生API测试</span>
       </template>
@@ -15,7 +16,7 @@
         <h4>学生数据结果:</h4>
         <pre>{{ JSON.stringify(studentsResult, null, 2) }}</pre>
       </div>
-    </el-card>
+    </el-card> -->
     
     <el-card class="test-card">
       <template #header>
@@ -37,27 +38,29 @@
 <script setup>
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { getStudents, getCourses } from '@/utils/api'
+import { getCourses } from '@/utils/api'
+// import { getStudents } from '@/utils/api' // 学生管理 API 已注释
 
 const testingStudents = ref(false)
 const testingCourses = ref(false)
 const studentsResult = ref(null)
 const coursesResult = ref(null)
 
-const testStudentsAPI = async () => {
-  testingStudents.value = true
-  try {
-    const response = await getStudents({ per_page: 10 })
-    studentsResult.value = response.data
-    ElMessage.success('学生API测试成功')
-  } catch (error) {
-    console.error('学生API测试失败:', error)
-    ElMessage.error('学生API测试失败: ' + (error.response?.data?.message || error.message))
-    studentsResult.value = { error: error.message }
-  } finally {
-    testingStudents.value = false
-  }
-}
+// 学生管理 API 已注释
+// const testStudentsAPI = async () => {
+//   testingStudents.value = true
+//   try {
+//     const response = await getStudents({ per_page: 10 })
+//     studentsResult.value = response.data
+//     ElMessage.success('学生API测试成功')
+//   } catch (error) {
+//     console.error('学生API测试失败:', error)
+//     ElMessage.error('学生API测试失败: ' + (error.response?.data?.message || error.message))
+//     studentsResult.value = { error: error.message }
+//   } finally {
+//     testingStudents.value = false
+//   }
+// }
 
 const testCoursesAPI = async () => {
   testingCourses.value = true
