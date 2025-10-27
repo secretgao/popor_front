@@ -170,7 +170,7 @@
 import { ref, reactive, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
-import { getInvoices, createInvoice, updateInvoice, updateInvoiceStatus, getCourses } from '@/utils/api'
+import { getInvoices, createInvoice, updateInvoice, updateInvoiceStatus, getStudents, getCourses } from '@/utils/api'
 
 // 数据
 const invoices = ref([])
@@ -246,12 +246,20 @@ const loadInvoices = async () => {
 // 加载学生和课程数据
 const loadFormData = async () => {
   try {
-    // 只加载课程数据（学生管理模块已注释）
-    const coursesResponse = await getCourses({ per_page: 1000 })
+    // 并行加载学生和课程数据
+    const [studentsResponse, coursesResponse] = await Promise.all([
+      getStudents({ per_page: 1000 }), // 获取所有学生
+      getCourses({ per_page: 1000 })   // 获取所有课程
+    ])
     
-    // 学生数据设为空（学生管理模块已注释）
-    students.value = []
-    console.log('ℹ️ 学生管理模块已注释，学生数据为空')
+    // 处理学生数据
+    if (studentsResponse.data.success) {
+      students.value = studentsResponse.data.data.students || []
+      console.log('✅ 学生数据加载成功:', students.value.length, '个学生')
+    } else {
+      console.error('❌ 学生数据加载失败:', studentsResponse.data.message)
+      students.value = []
+    }
     
     // 处理课程数据
     if (coursesResponse.data.success) {

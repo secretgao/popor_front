@@ -136,8 +136,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Search } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
-// 学生管理 API 已注释
-// import { getStudents, createStudent, getStudentCourses, getStudentInvoices, updateStudentStatus, updateStudentInfo } from '@/utils/api'
+import { getStudents, createStudent, getStudentCourses, getStudentInvoices, updateStudentStatus, updateStudentInfo } from '@/utils/api'
 
 const authStore = useAuthStore()
 
@@ -212,27 +211,27 @@ const filteredStudents = computed(() => {
   )
 })
 
-// 加载学生列表 - 学生管理模块已注释
-// const loadStudents = async () => {
-//   loading.value = true
-//   try {
-//     const response = await getStudents({
-//       page: 1,
-//       per_page: 50
-//     })
-//     
-//     if (response.data.success) {
-//       students.value = response.data.data.students
-//     } else {
-//       ElMessage.error(response.data.message || '加载学生列表失败')
-//     }
-//   } catch (error) {
-//     console.error('加载学生列表失败:', error)
-//     ElMessage.error('加载学生列表失败')
-//   } finally {
-//     loading.value = false
-//   }
-// }
+// 加载学生列表
+const loadStudents = async () => {
+  loading.value = true
+  try {
+    const response = await getStudents({
+      page: 1,
+      per_page: 50
+    })
+    
+    if (response.data.success) {
+      students.value = response.data.data.students
+    } else {
+      ElMessage.error(response.data.message || '加载学生列表失败')
+    }
+  } catch (error) {
+    console.error('加载学生列表失败:', error)
+    ElMessage.error('加载学生列表失败')
+  } finally {
+    loading.value = false
+  }
+}
 
 // 添加学生
 const addStudent = async () => {
@@ -282,7 +281,7 @@ const addStudent = async () => {
         email: '',
         password: ''
       })
-      // loadStudents() // 学生管理模块已注释
+      loadStudents()
     } else {
       ElMessage.error(response.data.message || '添加学生失败')
     }
@@ -311,7 +310,7 @@ const handleDeleteStudent = async (student) => {
     
     if (response.data.success) {
       ElMessage.success('学生删除成功')
-      // loadStudents() // 学生管理模块已注释 // 重新加载列表
+      loadStudents() // 重新加载列表
     } else {
       ElMessage.error(response.data.message || '删除学生失败')
     }
@@ -340,7 +339,7 @@ const handleRestoreStudent = async (student) => {
     
     if (response.data.success) {
       ElMessage.success('学生恢复成功')
-      // loadStudents() // 学生管理模块已注释 // 重新加载列表
+      loadStudents() // 重新加载列表
     } else {
       ElMessage.error(response.data.message || '恢复学生失败')
     }
@@ -413,7 +412,7 @@ const updateStudent = async () => {
     if (response.data.success) {
       ElMessage.success('学生信息更新成功')
       showEditStudentDialog.value = false
-      // loadStudents() // 学生管理模块已注释 // 重新加载列表
+      loadStudents() // 重新加载列表
     } else {
       ElMessage.error(response.data.message || '更新学生信息失败')
     }
@@ -428,7 +427,7 @@ const updateStudent = async () => {
 
 
 onMounted(() => {
-  // loadStudents() // 学生管理模块已注释
+  loadStudents()
 })
 </script>
 

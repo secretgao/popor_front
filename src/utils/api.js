@@ -135,34 +135,34 @@ export const updateCourseStatus = (id, data) => {
 }
 
 
-// 学生管理 API - 已注释
-// export const getStudents = (params = {}) => {
-//   return api.get('/students', { params })
-// }
+// 学生管理 API
+export const getStudents = (params = {}) => {
+  return api.get('/students', { params })
+}
 
-// export const createStudent = (data) => {
-//   return api.post('/students', data)
-// }
+export const createStudent = (data) => {
+  return api.post('/students', data)
+}
 
-// export const getStudent = (id) => {
-//   return api.get(`/students/${id}`)
-// }
+export const getStudent = (id) => {
+  return api.get(`/students/${id}`)
+}
 
-// export const getStudentCourses = (id) => {
-//   return api.get(`/students/${id}/courses`)
-// }
+export const getStudentCourses = (id) => {
+  return api.get(`/students/${id}/courses`)
+}
 
-// export const updateStudentStatus = (id, data) => {
-//   return api.put(`/students/${id}/status`, data)
-// }
+export const updateStudentStatus = (id, data) => {
+  return api.put(`/students/${id}/status`, data)
+}
 
-// export const updateStudentInfo = (id, data) => {
-//   return api.put(`/students/${id}`, data)
-// }
+export const updateStudentInfo = (id, data) => {
+  return api.put(`/students/${id}`, data)
+}
 
-// export const getStudentInvoices = (id) => {
-//   return api.get(`/students/${id}/invoices`)
-// }
+export const getStudentInvoices = (id) => {
+  return api.get(`/students/${id}/invoices`)
+}
 
 // 学生我的课程 API
 export const getMyCourses = (params = {}) => {

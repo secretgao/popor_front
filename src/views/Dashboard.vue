@@ -44,8 +44,7 @@
                 <span>教师功能</span>
               </template>
               <el-menu-item index="/courses">课程管理</el-menu-item>
-              <!-- 学生管理模块已注释 -->
-              <!-- <el-menu-item index="/students">学生管理</el-menu-item> -->
+              <el-menu-item index="/students">学生管理</el-menu-item>
               <el-menu-item index="/invoices">账单管理</el-menu-item>
             </el-sub-menu>
           </template>
