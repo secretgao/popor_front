@@ -45,16 +45,17 @@ const routes = [
       role: 'teacher'
     }
   },
-  {
-    path: '/students',
-    name: 'TeacherStudents',
-    component: () => import('@/views/teacher/Students.vue'),
-    meta: { 
-      title: '学生管理',
-      requiresAuth: true,
-      role: 'teacher'
-    }
-  },
+  // 学生管理模块已注释
+  // {
+  //   path: '/students',
+  //   name: 'TeacherStudents',
+  //   component: () => import('@/views/teacher/Students.vue'),
+  //   meta: { 
+  //     title: '学生管理',
+  //     requiresAuth: true,
+  //     role: 'teacher'
+  //   }
+  // },
   {
     path: '/invoices',
     name: 'TeacherInvoices',
